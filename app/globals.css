@@ -1,0 +1,338 @@
+@import "tailwindcss";
+@import "@heroui/styles";
+
+/*
+ * Arcane Launcher brand palette, layered on top of HeroUI's dark theme
+ * tokens. These are plain (unlayered) rules, so they win over HeroUI's
+ * `@layer base` variables regardless of import order — every component
+ * (Button, Card, Chip, Accordion, ...) picks these up automatically.
+ */
+:root {
+  --accent: #ef3b4d;
+  --accent-strong: #ff5064;
+  --accent-foreground: #ffffff;
+  --accent-rgb: 239, 59, 77;
+}
+
+.dark {
+  --background: #070708;
+  --foreground: #f5f5f6;
+
+  --surface: #111114;
+  --surface-secondary: #17171b;
+  --surface-tertiary: #1c1c21;
+  --overlay: #131318;
+
+  --muted: #96969d;
+
+  --border: rgba(255, 255, 255, 0.08);
+  --separator: rgba(255, 255, 255, 0.07);
+
+  --default: rgba(255, 255, 255, 0.06);
+  --default-hover: rgba(255, 255, 255, 0.1);
+  --default-foreground: var(--foreground);
+
+  --field-background: #111114;
+}
+
+@theme inline {
+  --color-accent-strong: var(--accent-strong);
+  --font-sans: var(--font-sora);
+}
+
+* {
+  border-color: var(--color-border);
+}
+
+/* body must be allowed to grow with its content (min-height, not height):
+   a fixed-height flex body shrinks the page wrapper to one viewport, which
+   stops the sticky header from following the scroll past the first screen.
+   Lenis's stylesheet sets `html.lenis { height: auto }`, so the body's minimum
+   is a viewport unit rather than a percentage of html — that keeps the footer
+   pinned to the bottom of short pages either way. */
+html {
+  height: 100%;
+}
+
+body {
+  min-height: 100vh;
+  min-height: 100dvh;
+}
+
+/* Hide scroll bars everywhere; scrolling itself (wheel, touch, keys) still works */
+html,
+body,
+* {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+*::-webkit-scrollbar {
+  display: none;
+}
+
+body {
+  background: var(--color-background);
+  color: var(--color-foreground);
+  font-family: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Hover lift + accent glow used on top of HeroUI's <Card> component */
+.feature-card {
+  transition:
+    border-color 250ms ease,
+    transform 250ms ease,
+    box-shadow 250ms ease;
+}
+
+.feature-card:hover {
+  border-color: color-mix(in oklab, var(--accent) 35%, transparent);
+  transform: translateY(-3px);
+  box-shadow: 0 16px 40px -20px color-mix(in oklab, var(--accent) 45%, transparent);
+}
+
+/* Cursor-tracking accent glow used on the feature marquee cards */
+.spotlight-card {
+  --spot-x: 50%;
+  --spot-y: 50%;
+}
+
+.spotlight-glow {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  opacity: 0;
+  transition: opacity 300ms ease;
+  background: radial-gradient(
+    240px circle at var(--spot-x) var(--spot-y),
+    color-mix(in oklab, var(--accent) 20%, transparent),
+    transparent 70%
+  );
+}
+
+.spotlight-card:hover .spotlight-glow {
+  opacity: 1;
+}
+
+/* Floating navbar: the header is a transparent sticky strip that lets clicks
+   through; only the glass pill inside it is interactive. */
+.site-header {
+  position: sticky;
+  top: 0;
+  pointer-events: none;
+}
+
+.nav-pill {
+  pointer-events: auto;
+  background: color-mix(in oklab, var(--background) 55%, transparent);
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  box-shadow:
+    0 12px 40px -16px rgba(0, 0, 0, 0.7),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(18px) saturate(140%);
+  -webkit-backdrop-filter: blur(18px) saturate(140%);
+  transition:
+    background-color 300ms ease,
+    border-color 300ms ease,
+    box-shadow 300ms ease;
+}
+
+/* Once the page has scrolled, the pill firms up and picks up an accent edge
+   so content passing under it stays legible. */
+.site-header[data-scrolled="true"] .nav-pill {
+  background: color-mix(in oklab, var(--background) 84%, transparent);
+  border-color: color-mix(in oklab, var(--accent) 30%, rgba(255, 255, 255, 0.08));
+  box-shadow:
+    0 16px 50px -16px rgba(0, 0, 0, 0.85),
+    0 0 44px -20px var(--accent),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+
+.nav-drop {
+  pointer-events: auto;
+  transform-origin: top center;
+  animation: nav-drop 180ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+@keyframes nav-drop {
+  from {
+    opacity: 0;
+    transform: translateY(-8px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .nav-drop {
+    animation: none;
+  }
+}
+
+/* Anchor jumps (/#features, /#faq) land below the floating header */
+html {
+  scroll-padding-top: 6rem;
+}
+
+/* Gaming background (see components/animated-background.tsx) */
+
+/* The grass field scrolls one tile toward the viewer, then loops seamlessly. */
+.gbg-floor {
+  animation: gbg-floor 3s linear infinite;
+  will-change: transform;
+}
+
+@keyframes gbg-floor {
+  to {
+    transform: translateY(64px);
+  }
+}
+
+/* Floating blocks: a slow tumble inside a gentle bob. */
+.gbg-spin {
+  animation: gbg-spin 40s linear infinite;
+  will-change: transform;
+}
+
+@keyframes gbg-spin {
+  from {
+    transform: rotateX(var(--tilt, -24deg)) rotateY(0deg);
+  }
+  to {
+    transform: rotateX(var(--tilt, -24deg)) rotateY(360deg);
+  }
+}
+
+.gbg-float {
+  animation: gbg-float 7s ease-in-out infinite alternate;
+  will-change: transform;
+}
+
+@keyframes gbg-float {
+  from {
+    transform: translateY(-14px);
+  }
+  to {
+    transform: translateY(14px);
+  }
+}
+
+/* Blocky clouds drifting across. They start and end fully off-screen (the
+   widest cloud is under 600px) so they never pop in or out. */
+.gbg-cloud {
+  animation: gbg-cloud 160s linear infinite;
+  will-change: transform;
+}
+
+@keyframes gbg-cloud {
+  from {
+    transform: translateX(-600px);
+  }
+  to {
+    transform: translateX(calc(100vw + 100px));
+  }
+}
+
+.arcane-aurora {
+  animation: arcane-aurora 28s ease-in-out infinite alternate;
+  will-change: transform;
+}
+
+@keyframes arcane-aurora {
+  from {
+    transform: translateX(-52%) translateY(0) scale(1);
+  }
+  to {
+    transform: translateX(-48%) translateY(4%) scale(1.08);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gbg-floor,
+  .gbg-spin,
+  .gbg-float,
+  .arcane-aurora {
+    animation: none;
+  }
+
+  .gbg-cloud {
+    display: none;
+  }
+}
+
+/* Steve, pacing along the bottom of the page (see components/animated-steve.tsx).
+   He walks off one side, turns around off-screen, and walks back. */
+.steve-walker {
+  animation: steve-pace 90s linear infinite;
+  will-change: transform;
+}
+
+@keyframes steve-pace {
+  0% {
+    transform: translateX(-140px);
+  }
+  50% {
+    transform: translateX(calc(100vw + 40px));
+  }
+  100% {
+    transform: translateX(-140px);
+  }
+}
+
+/* Faces right on the way out and left on the way back; the flip happens
+   while he's off-screen. */
+.steve-flip {
+  animation: steve-turn 90s steps(1, end) infinite;
+}
+
+@keyframes steve-turn {
+  0% {
+    transform: scaleX(1);
+  }
+  50% {
+    transform: scaleX(-1);
+  }
+}
+
+.steve-body {
+  animation: steve-bob 0.45s ease-in-out infinite alternate;
+}
+
+@keyframes steve-bob {
+  to {
+    transform: translateY(-0.6px);
+  }
+}
+
+/* Limbs swing from the shoulder / hip; each arm opposes its own-side leg. */
+.steve-leg-a,
+.steve-leg-b,
+.steve-arm-a,
+.steve-arm-b {
+  transform-box: fill-box;
+  transform-origin: 50% 0%;
+  animation: steve-swing 0.9s ease-in-out infinite alternate;
+}
+
+.steve-leg-b,
+.steve-arm-a {
+  animation-direction: alternate-reverse;
+}
+
+@keyframes steve-swing {
+  from {
+    transform: rotate(-32deg);
+  }
+  to {
+    transform: rotate(32deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .steve-walker {
+    display: none;
+  }
+}

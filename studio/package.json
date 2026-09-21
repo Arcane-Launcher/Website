@@ -1,0 +1,23 @@
+{
+  "name": "arcane-news-studio",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Sanity Studio where Arcane Launcher news posts are written and published.",
+  "scripts": {
+    "dev": "sanity dev",
+    "build": "sanity build",
+    "deploy": "sanity deploy",
+    "schema:validate": "sanity schema validate",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "react": "^19.2.2",
+    "react-dom": "^19.2.2",
+    "sanity": "^6.15.0",
+    "styled-components": "^6.1.15"
+  },
+  "devDependencies": {
+    "@types/react": "^19",
+    "typescript": "^5"
+  }
+}
