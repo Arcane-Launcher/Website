@@ -55,3 +55,7 @@ skills-lock.json
 /public/mods.png
 /public/skinuploader.png
 /public/apperance.png
+
+# Local AI-assistant instruction files
+/AGENTS.md
+/CLAUDE.md
