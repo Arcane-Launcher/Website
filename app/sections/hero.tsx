@@ -5,8 +5,17 @@ import { CircuitMotif } from "../components/circuit-motif";
 import { Reveal } from "../components/reveal";
 import { screenshotSrc } from "../lib/cloudinary";
 import { INTEGRATIONS } from "../lib/site-content";
+import { fetchLatestRelease } from "../lib/updates";
 
-export function Hero() {
+/// How often the hero re-checks for a published release. Doesn't need to be
+/// as fresh as the launcher's own update check — this only gates whether the
+/// download button is clickable, not an in-app update.
+const LATEST_RELEASE_REVALIDATE_SECONDS = 60;
+
+export async function Hero() {
+  const latest = await fetchLatestRelease(LATEST_RELEASE_REVALIDATE_SECONDS);
+  const windowsUrl = latest.status === "ok" ? latest.release.platforms["windows-x86_64"]?.url : undefined;
+
   return (
     <section className="relative overflow-hidden px-6 pt-10 pb-16 sm:px-10 sm:pt-16">
       <div aria-hidden className="pointer-events-none absolute inset-0">
@@ -54,14 +63,29 @@ export function Hero() {
                 <Link href="#features" className={buttonVariants({ variant: "outline" }) + " text-sm"}>
                   See features
                 </Link>
-                <Button variant="primary" isDisabled className="text-sm">
-                  Download for Windows
-                </Button>
+                {windowsUrl ? (
+                  <Link href={windowsUrl} className={buttonVariants({ variant: "primary" }) + " text-sm no-underline"}>
+                    Download for Windows
+                  </Link>
+                ) : (
+                  <Button variant="primary" isDisabled className="text-sm">
+                    Download for Windows
+                  </Button>
+                )}
               </div>
               <div className="flex items-center gap-2.5">
                 <BetaBadge scale={1.4} />
                 <Paragraph size="xs" color="muted">
-                  Coming soon — the first release hasn&apos;t shipped yet.
+                  {windowsUrl ? (
+                    <>
+                      v{latest.status === "ok" ? latest.release.version : ""} ·{" "}
+                      <Link href="/changelog" className="text-accent-strong underline underline-offset-2 hover:text-white">
+                        what&apos;s new
+                      </Link>
+                    </>
+                  ) : (
+                    "Coming soon — the first release hasn't shipped yet."
+                  )}
                 </Paragraph>
               </div>
             </div>

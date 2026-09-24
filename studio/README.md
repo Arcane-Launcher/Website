@@ -15,10 +15,13 @@ You need a free Sanity account. Anything that asks you to sign in below is done 
 2. **Configure the Studio.**
    ```powershell
    cd website/studio
-   copy .env.example .env      # then open .env and paste the Project ID
+   # create studio/.env containing: SANITY_STUDIO_PROJECT_ID=<the Project ID>
    npm install
    npx sanity login
    ```
+   Optional lines for the same `studio/.env` file: `SANITY_STUDIO_DATASET` (defaults to `production`),
+   `SANITY_STUDIO_SITE_URL` (the public site address, e.g. `https://your-site.com`, which adds an "Open on
+   site" action to published posts) and `SANITY_STUDIO_HOST` (the name for `https://<name>.sanity.studio`).
 3. **Try it locally:** `npm run dev` opens the Studio at <http://localhost:3333>.
    If it complains about CORS, allow it once: `npx sanity cors add http://localhost:3333 --credentials`.
 4. **Host it** so editors don't need this folder: `npm run deploy`. Sanity hosts it for free at
