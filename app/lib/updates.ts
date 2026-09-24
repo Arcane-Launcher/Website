@@ -48,9 +48,13 @@ export async function fetchLatestRelease(revalidateSeconds: number): Promise<Lat
   try {
     const res = await fetch(`${base}/latest.json`, { next: { revalidate: revalidateSeconds } });
     if (res.status === 404) return { status: "none" };
-    if (!res.ok) return { status: "error" };
+    if (!res.ok) {
+      console.error(`latest.json: HTTP ${res.status} from ${base}`);
+      return { status: "error" };
+    }
     return { status: "ok", release: (await res.json()) as LatestRelease };
-  } catch {
+  } catch (error) {
+    console.error(`latest.json: fetch from ${base} failed`, error);
     return { status: "error" };
   }
 }
@@ -71,9 +75,13 @@ export async function fetchReleaseHistory(revalidateSeconds: number): Promise<Re
     const res = await fetch(`${base}/releases.json`, { next: { revalidate: revalidateSeconds } });
     // A fresh bucket with nothing published yet is the same as an empty list.
     if (res.status === 404) return { status: "ok", releases: [] };
-    if (!res.ok) return { status: "error" };
+    if (!res.ok) {
+      console.error(`releases.json: HTTP ${res.status} from ${base}`);
+      return { status: "error" };
+    }
     return { status: "ok", releases: (await res.json()) as ReleaseHistoryEntry[] };
-  } catch {
+  } catch (error) {
+    console.error(`releases.json: fetch from ${base} failed`, error);
     return { status: "error" };
   }
 }
