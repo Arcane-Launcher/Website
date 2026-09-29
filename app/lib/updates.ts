@@ -59,6 +59,66 @@ export async function fetchLatestRelease(revalidateSeconds: number): Promise<Lat
   }
 }
 
+/// One direct download on the /download page. `size` is in bytes; it's
+/// missing when the entry came from latest.json (the fallback below).
+export interface DownloadFile {
+  version: string;
+  url: string;
+  size?: number;
+}
+
+/// windows / windows-arm64 installers, appimage, deb, rpm, pacman.
+export type DownloadKind = "windows" | "windows-arm64" | "appimage" | "deb" | "rpm" | "pacman";
+
+export type DownloadFiles = Partial<Record<DownloadKind, DownloadFile>>;
+
+export type DownloadsResult =
+  | { status: "ok"; files: DownloadFiles }
+  | { status: "unconfigured" }
+  | { status: "error" };
+
+const PLATFORM_KIND: Record<string, DownloadKind> = {
+  "windows-x86_64": "windows",
+  "windows-aarch64": "windows-arm64",
+  "linux-x86_64": "appimage",
+};
+
+/// Every direct download, from the downloads.json that
+/// `scripts/publish-update.mjs` writes next to latest.json. The .deb, .rpm
+/// and pacman packages are only listed there (they don't self-update, so
+/// they're not in latest.json). Releases published before downloads.json
+/// existed fall back to latest.json's installers.
+export async function fetchDownloads(revalidateSeconds: number): Promise<DownloadsResult> {
+  const base = updatesBaseUrl();
+  if (!base) return { status: "unconfigured" };
+
+  try {
+    const res = await fetch(`${base}/downloads.json`, { next: { revalidate: revalidateSeconds } });
+    if (res.ok) {
+      const body = (await res.json()) as { files?: DownloadFiles };
+      return { status: "ok", files: body.files ?? {} };
+    }
+    if (res.status !== 404) {
+      console.error(`downloads.json: HTTP ${res.status} from ${base}`);
+      return { status: "error" };
+    }
+  } catch (error) {
+    console.error(`downloads.json: fetch from ${base} failed`, error);
+    return { status: "error" };
+  }
+
+  const latest = await fetchLatestRelease(revalidateSeconds);
+  if (latest.status === "unconfigured" || latest.status === "error") return latest;
+  const files: DownloadFiles = {};
+  if (latest.status === "ok") {
+    for (const [key, platform] of Object.entries(latest.release.platforms)) {
+      const kind = PLATFORM_KIND[key];
+      if (kind) files[kind] = { version: latest.release.version, url: platform.url };
+    }
+  }
+  return { status: "ok", files };
+}
+
 export type ReleaseHistoryResult =
   | { status: "ok"; releases: ReleaseHistoryEntry[] }
   | { status: "unconfigured" }

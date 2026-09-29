@@ -128,7 +128,7 @@ export function SiteHeader() {
           </nav>
 
           <NextLink
-            href="/#download"
+            href="/download"
             className={buttonVariants({ variant: "primary", size: "sm" }) + " hidden h-10 rounded-full px-5 text-[13px] font-bold no-underline sm:inline-flex"}
           >
             Download
@@ -171,7 +171,7 @@ export function SiteHeader() {
             );
           })}
           <NextLink
-            href="/#download"
+            href="/download"
             onClick={closeMenu}
             className={buttonVariants({ variant: "primary" }) + " mt-1 h-12 w-full justify-center rounded-2xl text-sm font-bold no-underline"}
           >

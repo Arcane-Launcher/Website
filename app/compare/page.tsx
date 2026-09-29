@@ -124,7 +124,7 @@ export default function ComparePage() {
               When another launcher is the better fit
             </Heading>
             <ul className="mt-4 flex list-disc flex-col gap-2 pl-5 text-sm leading-relaxed text-muted marker:text-accent">
-              <li>You&apos;re on macOS or Linux. Arcane is Windows-only for now.</li>
+              <li>You&apos;re on macOS. Arcane runs on Windows and Linux for now.</li>
               <li>You download most of your mods and modpacks from CurseForge. Prism and the CurseForge app browse it directly.</li>
             </ul>
             <p className="mt-5 text-sm leading-relaxed text-muted">

@@ -15,7 +15,7 @@ const PRODUCT: FooterColumn = {
     { label: "Features", href: "/#features" },
     { label: "Compare", href: "/compare" },
     { label: "FAQ", href: "/#faq" },
-    { label: "Download", href: "/#download" },
+    { label: "Download", href: "/download" },
   ],
 };
 

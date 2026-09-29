@@ -41,7 +41,7 @@ const undocumented: Cell = { state: "undocumented" };
 export const COMPARE_ROWS: CompareRow[] = [
   {
     feature: "Platforms",
-    arcane: { state: "notyet", text: "Windows only for now" },
+    arcane: { state: "partial", text: "Windows, Linux (no macOS yet)" },
     others: {
       prism: { state: "yes", text: "Windows, macOS, Linux" },
       curseforge: { state: "yes", text: "Windows, macOS, Linux" },

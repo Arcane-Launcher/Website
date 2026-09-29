@@ -38,6 +38,11 @@ export const FAQS: Faq[] = [
       "Export any instance as a .zip, or duplicate it into a new one — mods, config, saves, and resource packs come along, and shared libraries aren't re-downloaded.",
   },
   {
+    question: "Does it run on Linux?",
+    answer:
+      "Yes. There's an AppImage that runs on any 64-bit distribution and updates itself, plus .deb, .rpm and Arch Linux packages. macOS isn't supported yet.",
+  },
+  {
     question: "Why isn't it built on Electron?",
     answer:
       "Arcane Launcher is a Tauri app under the hood — small install size, low idle memory, and a launcher that opens instantly.",

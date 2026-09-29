@@ -1,11 +1,12 @@
 import Image from "next/image";
-import { Button, Chip, Heading, Link, Paragraph, Surface, buttonVariants } from "@heroui/react";
+import { Chip, Heading, Link, Paragraph, Surface, buttonVariants } from "@heroui/react";
 import { BetaBadge } from "../components/beta-badge";
 import { CircuitMotif } from "../components/circuit-motif";
+import { DownloadButtons } from "../components/download-button";
 import { Reveal } from "../components/reveal";
 import { screenshotSrc } from "../lib/cloudinary";
 import { INTEGRATIONS } from "../lib/site-content";
-import { fetchLatestRelease } from "../lib/updates";
+import { fetchDownloads } from "../lib/updates";
 
 /// How often the hero re-checks for a published release. Doesn't need to be
 /// as fresh as the launcher's own update check — this only gates whether the
@@ -13,8 +14,11 @@ import { fetchLatestRelease } from "../lib/updates";
 const LATEST_RELEASE_REVALIDATE_SECONDS = 60;
 
 export async function Hero() {
-  const latest = await fetchLatestRelease(LATEST_RELEASE_REVALIDATE_SECONDS);
-  const windowsUrl = latest.status === "ok" ? latest.release.platforms["windows-x86_64"]?.url : undefined;
+  const downloads = await fetchDownloads(LATEST_RELEASE_REVALIDATE_SECONDS);
+  const files = downloads.status === "ok" ? downloads.files : {};
+  const windowsUrl = files.windows?.url;
+  const hasLinux = Boolean(files.appimage || files.deb || files.rpm || files.pacman);
+  const version = (files.windows ?? files.appimage ?? files.deb)?.version;
 
   return (
     <section className="relative overflow-hidden px-6 pt-10 pb-16 sm:px-10 sm:pt-16">
@@ -58,29 +62,25 @@ export async function Hero() {
               Arcane Launcher manages your Minecraft instances, mods, and versions the way a launcher should — real
               compatibility checks, safe upgrades and downgrades, and nothing left to guesswork.
             </Paragraph>
-            <div id="download" data-reveal-group="hero-cta" className="flex shrink-0 flex-col items-start gap-2 sm:items-end">
-              <div className="flex gap-2.5">
+            <div id="download" data-reveal-group="hero-cta" className="flex w-full flex-col items-start gap-2 sm:w-auto sm:shrink-0 sm:items-end">
+              <div className="flex flex-wrap gap-2.5 sm:justify-end">
                 <Link href="#features" className={buttonVariants({ variant: "outline" }) + " text-sm"}>
                   See features
                 </Link>
-                {windowsUrl ? (
-                  <Link href={windowsUrl} className={buttonVariants({ variant: "primary" }) + " text-sm no-underline"}>
-                    Download for Windows
-                  </Link>
-                ) : (
-                  <Button variant="primary" isDisabled className="text-sm">
-                    Download for Windows
-                  </Button>
-                )}
+                <DownloadButtons windowsUrl={windowsUrl} hasLinux={hasLinux} />
               </div>
               <div className="flex items-center gap-2.5">
                 <BetaBadge scale={1.4} />
                 <Paragraph size="xs" color="muted">
-                  {windowsUrl ? (
+                  {version ? (
                     <>
-                      v{latest.status === "ok" ? latest.release.version : ""} ·{" "}
+                      v{version} ·{" "}
                       <Link href="/changelog" className="text-accent-strong underline underline-offset-2 hover:text-white">
                         what&apos;s new
+                      </Link>{" "}
+                      ·{" "}
+                      <Link href="/download" className="text-accent-strong underline underline-offset-2 hover:text-white">
+                        all downloads
                       </Link>
                     </>
                   ) : (
